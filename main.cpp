@@ -1,3 +1,11 @@
+/**
+ * All examples are taken from C++ Senioreas blog
+ * https://cppsenioreas.wordpress.com/
+ *
+ * Examples from:
+ * cpp_senioreas::maintain_your_iterations_the_iterators_secret_part_1
+ */
+
 #include <iostream>
 #include <vector>
 #include <list>
@@ -19,7 +27,7 @@ public:
 template <typename T, template <typename...> typename Container>
 void init_container(Container<T> &cont, size_t size, T val = T()) {
     while (size--) {
-        cont.emplace(cont.begin(), val);
+        cont.push_back(val);
     }
 }
 
@@ -31,21 +39,36 @@ void print_container(Container<T> &cont) {
     std::cout << std::endl;
 }
 #else
+template <typename T, template <typename...> typename Container>
+void init_container(Container<T> &cont, size_t size, T val = T()) {
+    while (size--) {
+        cont.emplace_back(val);
+    }
+}
 
+template <typename Iterator>
+void print_container(Iterator first, Iterator last) {
+    for (; first != last; first++) {
+        std::cout << *first << " ";
+    }
+    std::cout << std::endl;
+}
 #endif
 
 int main() {
-    my_list<int> i_list;
-    init_container(i_list, 20);
-    for (size_t i = 0; i < i_list.size(); i++) {
-        i_list[i] = i;
+    std::list<int> i_list;
+    init_container(i_list, 20, 1);
+    size_t counter = 1;
+    for (auto current = i_list.begin(); current != i_list.end(); current++) {
+        *current = counter;
         // ...
-        for (size_t j = i; j < i_list.size(); j++) {
-            i_list[j] *= i;
+        for (auto inner_current = current; inner_current != i_list.end(); inner_current++) {
+            *inner_current *= counter;
             // ...
         }
         // ...
+        counter++;
     }
-    print_container(i_list);
+    print_container(i_list.begin(), i_list.end());
     return EXIT_SUCCESS;
 }

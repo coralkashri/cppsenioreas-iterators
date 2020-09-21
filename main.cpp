@@ -4,6 +4,7 @@
  *
  * Examples from:
  * cpp_senioreas::maintain_your_iterations_the_iterators_secret_part_1
+ * https://cppsenioreas.wordpress.com/2020/09/21/maintain-your-iterations-the-iterators-secret-part-1/
  */
 
 #include <iostream>

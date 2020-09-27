@@ -5,6 +5,9 @@
  * Examples from:
  * cpp_senioreas::maintain_your_iterations_the_iterators_secret_part_1
  * https://cppsenioreas.wordpress.com/2020/09/21/maintain-your-iterations-the-iterators-secret-part-1/
+ *
+ * cpp_senioreas::maintain_your_iterations_insecure_iterations_part_2
+ * https://cppsenioreas.wordpress.com/2020/09/27/maintain-your-iterations-insecure-iterations-part-2/
  */
 
 #include <iostream>

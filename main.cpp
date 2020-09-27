@@ -11,9 +11,13 @@
 #include <vector>
 #include <list>
 #include <set>
+#include <thread>
+#include <mutex>
 
+#define ARTICLE_PART 2
+
+#if ARTICLE_PART == 1
 #define USE_ITERATORS true
-
 #if !USE_ITERATORS
 template <typename T>
 class my_list : public std::list<T> {
@@ -48,15 +52,62 @@ void init_container(Container<T> &cont, size_t size, T val = T()) {
 }
 
 template <typename Iterator>
-void print_container(Iterator first, Iterator last) {
-    for (; first != last; first++) {
-        std::cout << *first << " ";
+void print_container(const Iterator &first, const Iterator &last) {
+    for (Iterator current = first; first != last; current++) {
+        std::cout << *current << " ";
     }
     std::cout << std::endl;
 }
 #endif
+#endif
+
+#if ARTICLE_PART == 2
+
+class my_system {
+public:
+    explicit my_system(int val) {
+        //values.emplace_back(val);
+        value = val;
+    };
+    ~my_system() = default;
+    my_system(const my_system&) = default;
+    my_system(my_system&&) = default;
+    my_system& operator=(const my_system &ref) = default;
+    my_system& operator=(my_system &&ref) = default;
+
+    void func() {
+        //std::cout << values[0] << std::endl; // 500 as expected
+        std::cout << value << std::endl; // 500 as expected
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+        //std::cout << values[0] << std::endl; // A garbage value
+        std::cout << value << std::endl; // A garbage value
+    }
+
+private:
+    //std::vector<int> values; // Make it a vector
+    int value; // Make it a vector
+};
+
+class my_collection {
+public:
+    void add_system() {
+        std::vector<my_system>::iterator it;
+        {
+            std::lock_guard g(guard);
+            my_systems.emplace_back(my_systems.size() + 500);
+            it = std::prev(my_systems.end());
+        }
+        it->func();
+    }
+
+private:
+    std::vector<my_system> my_systems;
+    std::mutex guard;
+};
+#endif
 
 int main() {
+#if ARTICLE_PART == 1
     std::list<int> i_list;
     init_container(i_list, 20, 1);
     size_t counter = 1;
@@ -71,5 +122,14 @@ int main() {
         counter++;
     }
     print_container(i_list.begin(), i_list.end());
+#endif
+#if ARTICLE_PART == 2
+    my_collection mc;
+    std::thread t([&] { mc.add_system(); });
+    std::thread t1([&] { mc.add_system(); });
+
+    t.join();
+    t1.join();
+#endif
     return EXIT_SUCCESS;
 }

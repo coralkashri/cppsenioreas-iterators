@@ -57,7 +57,7 @@ void init_container(Container<T> &cont, size_t size, T val = T()) {
 
 template <typename Iterator>
 void print_container(const Iterator &first, const Iterator &last) {
-    for (Iterator current = first; first != last; current++) {
+    for (Iterator current = first; current != last; current++) {
         std::cout << *current << " ";
     }
     std::cout << std::endl;
@@ -190,13 +190,13 @@ public:
     using base_it = base_legacy_iterator<std::random_access_iterator_tag, T>;
 
     // Ctors & Assign Operators & Dtor
-    explicit my_iterator<T>(T* data = nullptr) : _data(data) {}
-    my_iterator<T>(const my_iterator<T>&) = default;
-    my_iterator<T>(my_iterator<T>&&) noexcept = default;
+    explicit my_iterator(T* data = nullptr) : _data(data) {}
+    my_iterator(const my_iterator<T>&) = default;
+    my_iterator(my_iterator<T>&&) noexcept = default;
     my_iterator<T>& operator=(const my_iterator<T>&) = default;
     my_iterator<T>& operator=(my_iterator<T>&&) noexcept = default;
     my_iterator<T>& operator=(T* data) { _data = data; return *this; };
-    ~my_iterator<T>() = default;
+    ~my_iterator() = default;
 
     // Is null
     explicit operator bool() const { return _data; }
@@ -292,9 +292,10 @@ private:
 };
 #endif
 
+
 int main() {
 #if ARTICLE_PART == 1
-    std::list<int> i_list;
+    std::vector<int> i_list;
     init_container(i_list, 20, 1);
     size_t counter = 1;
     for (auto current = i_list.begin(); current != i_list.end(); current++) {
@@ -328,8 +329,8 @@ int main() {
     vector_collection.add_item(9, 10);
     vector_collection.add_item(11, 12);
 
-    for (auto &elem : list_collection) {
-        std::cout << elem.item() << std::endl;
+    for (auto current = list_collection.begin(); current != list_collection.end(); current++) {
+        std::cout << current->item() << std::endl;
     }
 
     for (auto &elem : vector_collection) {

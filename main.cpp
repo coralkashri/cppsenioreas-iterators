@@ -17,6 +17,7 @@
 #include <thread>
 #include <mutex>
 #include <functional>
+#include <ranges>
 
 #define ARTICLE_PART 3
 
@@ -63,9 +64,7 @@ void print_container(const Iterator &first, const Iterator &last) {
     std::cout << std::endl;
 }
 #endif
-#endif
-
-#if ARTICLE_PART == 2
+#elif ARTICLE_PART == 2
 class my_system {
 public:
     explicit my_system(int val) {
@@ -107,10 +106,7 @@ private:
     std::vector<my_system> my_systems;
     std::mutex guard;
 };
-#endif
-
-#if ARTICLE_PART == 3
-
+#elif ARTICLE_PART == 3
 /*
  * Concepts Declarations
  */
@@ -255,6 +251,11 @@ private:
 template <template <typename ...> typename Container, HasMul ItemT>
 using my_collection_iterator = use_collection_iterator<Container, my_item<ItemT>>;
 
+/**
+ * A collection that uses an Iterators Friendly Container
+ * @tparam Container
+ * @tparam ItemT
+ */
 template <template <typename ...> typename Container, HasMul ItemT>
 class my_item_collection : public my_collection_iterator<Container, ItemT> {
 public:
@@ -290,6 +291,46 @@ public:
 private:
     Container<my_item<ItemT>> items;
 };
+
+/**
+ * A collection that use custom iterators
+ * @tparam ItemT
+ */
+template <HasMul ItemT>
+class my_item_special_collection : public use_collection_custom_iterator<my_iterator, my_item<ItemT>> {
+public:
+
+    // A convenient access to inherited type members
+    using base_types = use_collection_custom_iterator<my_iterator, my_item<ItemT>>;
+
+    /* Custom collection operations */
+
+    void add_item(const ItemT &a, const ItemT &b) {
+        items.emplace_back(a, b);
+    }
+
+    typename base_types::iterator get_item(size_t idx) {
+        auto res = items.begin();
+        return std::advance(res, idx);
+    }
+
+    /* Required Iterators Access Methods */
+
+    typename base_types::iterator begin() { return typename base_types::iterator(items.data()); }
+    typename base_types::iterator end() { return typename base_types::iterator(items.data() + items.size()); }
+    [[nodiscard]] typename base_types::const_iterator cbegin() const { return typename base_types::const_iterator(items.data()); }
+    [[nodiscard]] typename base_types::const_iterator cend() const { return typename base_types::const_iterator(items.data() + items.size()); }
+    typename base_types::reverse_iterator rbegin() { return typename base_types::reverse_iterator(end()--); }
+    typename base_types::reverse_iterator rend() { return typename base_types::reverse_iterator(begin()--); }
+    [[nodiscard]] typename base_types::const_reverse_iterator crbegin() const { return typename base_types::const_reverse_iterator(cend()--); }
+    [[nodiscard]] typename base_types::const_reverse_iterator crend() const { return typename base_types::const_reverse_iterator(cbegin()--); }
+
+    [[nodiscard]] bool empty() const { return items.empty(); }
+    [[nodiscard]] typename base_types::size_type size() const { return items.size(); }
+
+private:
+    std::vector<my_item<ItemT>> items;
+};
 #endif
 
 
@@ -309,18 +350,17 @@ int main() {
         counter++;
     }
     print_container(i_list.begin(), i_list.end());
-#endif
-#if ARTICLE_PART == 2
+#elif ARTICLE_PART == 2
     my_collection mc;
     std::thread t([&] { mc.add_system(); });
     std::thread t1([&] { mc.add_system(); });
 
     t.join();
     t1.join();
-#endif
-#if ARTICLE_PART == 3
+#elif ARTICLE_PART == 3
     my_item_collection<std::list, int> list_collection;
     my_item_collection<std::vector, int> vector_collection;
+    my_item_special_collection<int> my_special_collection;
     list_collection.add_item(1, 2);
     list_collection.add_item(3, 4);
     list_collection.add_item(5, 6);
@@ -329,12 +369,20 @@ int main() {
     vector_collection.add_item(9, 10);
     vector_collection.add_item(11, 12);
 
+    my_special_collection.add_item(13, 14);
+    my_special_collection.add_item(15, 16);
+    my_special_collection.add_item(17, 18);
+
     for (auto current = list_collection.begin(); current != list_collection.end(); current++) {
         std::cout << current->item() << std::endl;
     }
 
     for (auto &elem : vector_collection) {
         std::cout << elem.item() << std::endl;
+    }
+
+    for (auto current = my_special_collection.rbegin(); current != my_special_collection.rend(); current++) {
+        std::cout << current->item() << std::endl;
     }
 #endif
     return EXIT_SUCCESS;

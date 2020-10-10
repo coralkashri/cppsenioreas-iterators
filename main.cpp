@@ -9,7 +9,7 @@
  * cpp_senioreas::maintain_your_iterations_insecure_iterations_part_2
  * https://cppsenioreas.wordpress.com/2020/09/27/maintain-your-iterations-insecure-iterations-part-2/
  *
- * cpp_senioreas::maintain_your_iterators_customization_part_3
+ * cpp_senioreas::maintain_your_iterations_iterators_customization_part_3
  * https://cppsenioreas.wordpress.com/2020/10/04/maintain-your-iterations-iterators-customization-part-3/
  */
 
